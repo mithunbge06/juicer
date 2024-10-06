@@ -455,7 +455,7 @@ then
 fi  
 echo -ne "$threads threads; " >> $headfile
 java -version 2>&1 | awk 'NR==1{printf("%s; ", $0);}' >> $headfile
-${juiceDir}/scripts/common/juicer_tools -V 2>&1 | awk '$1=="Juicer" && $2=="Tools"{printf("%s; ", $0);}' >> $headfile
+${juiceDir}/CPU/common/juicer_tools -V 2>&1 | awk '$1=="Juicer" && $2=="Tools"{printf("%s; ", $0);}' >> $headfile
 echo "$0 $@" >> $headfile
 
 
@@ -496,7 +496,7 @@ then
 	    usegzip=1
 	fi
 
-	source ${juiceDir}/scripts/common/countligations.sh
+	source ${juiceDir}/CPU/common/countligations.sh
 
 	if [ -z "$chimeric" ]
 	then
@@ -542,17 +542,17 @@ then
 	then		
 	    if [ $singleend -eq 1 ]
 	    then
-		awk -v stem=${name}${ext}_norm -v site_file=$site_file -v singleend=$singleend -f $juiceDir/scripts/common/chimeric_sam.awk $name$ext.sam | samtools sort  -t cb -n $sthreadstring >  ${name}${ext}.bam
+		awk -v stem=${name}${ext}_norm -v site_file=$site_file -v singleend=$singleend -f $juiceDir/CPU/common/chimeric_sam.awk $name$ext.sam | samtools sort  -t cb -n $sthreadstring >  ${name}${ext}.bam
 	    else
-		awk -v stem=${name}${ext}_norm -v site_file=$site_file -f $juiceDir/scripts/common/chimeric_sam.awk $name$ext.sam | samtools sort -t cb -n $sthreadstring >  ${name}${ext}.bam
+		awk -v stem=${name}${ext}_norm -v site_file=$site_file -f $juiceDir/CPU/common/chimeric_sam.awk $name$ext.sam | samtools sort -t cb -n $sthreadstring >  ${name}${ext}.bam
 	    fi
 	else
 	    if [ $singleend -eq 1 ]
 	    then
-		awk -v stem=${name}${ext}_norm -v singleend=$singleend -f $juiceDir/scripts/common/chimeric_sam.awk $name$ext.sam | samtools sort  -t cb -n $sthreadstring >  ${name}${ext}.bam
+		awk -v stem=${name}${ext}_norm -v singleend=$singleend -f $juiceDir/CPU/common/chimeric_sam.awk $name$ext.sam | samtools sort  -t cb -n $sthreadstring >  ${name}${ext}.bam
 	    else
-		awk -v stem=${name}${ext}_norm -f $juiceDir/scripts/common/chimeric_sam.awk $name$ext.sam > $name$ext.sam2
-		awk -v avgInsertFile=${name}${ext}_norm.txt.res.txt -f $juiceDir/scripts/common/adjust_insert_size.awk $name$ext.sam2 | samtools sort -t cb -n $sthreadstring >  ${name}${ext}.bam
+		awk -v stem=${name}${ext}_norm -f $juiceDir/CPU/common/chimeric_sam.awk $name$ext.sam > $name$ext.sam2
+		awk -v avgInsertFile=${name}${ext}_norm.txt.res.txt -f $juiceDir/CPU/common/adjust_insert_size.awk $name$ext.sam2 | samtools sort -t cb -n $sthreadstring >  ${name}${ext}.bam
 	    fi
 	fi
 
@@ -599,9 +599,9 @@ if [ -z $final ] && [ -z $postproc ]
 then
     if [ $justexact -eq 1 ]
     then
-	samtools view $sthreadstring -h $outputdir/merged_sort.bam | awk -f $juiceDir/scripts/common/dups_sam.awk -v nowobble=1 > $outputdir/merged_dedup.sam
+	samtools view $sthreadstring -h $outputdir/merged_sort.bam | awk -f $juiceDir/CPU/common/dups_sam.awk -v nowobble=1 > $outputdir/merged_dedup.sam
     else
-	samtools view $sthreadstring -h $outputdir/merged_sort.bam | awk -f $juiceDir/scripts/common/dups_sam.awk  > $outputdir/merged_dedup.sam
+	samtools view $sthreadstring -h $outputdir/merged_sort.bam | awk -f $juiceDir/CPU/common/dups_sam.awk  > $outputdir/merged_dedup.sam
     fi
     if [ $? -ne 0 ]
     then
@@ -642,16 +642,16 @@ if [ -z $postproc ]
 	    echo "***! Error! The sorted file and dups/no dups files do not add up, or were empty."
 	    exit 1
 	fi
-	samtools view $sthreadstring -F 1024 -O sam ${outputdir}/merged_dedup.sam | awk -v mapq=1 -f ${juiceDir}/scripts/common/sam_to_pre.awk > ${outputdir}/merged1.txt
-	samtools view $sthreadstring -F 1024 -O sam ${outputdir}/merged_dedup.sam | awk -v mapq=30 -f ${juiceDir}/scripts/common/sam_to_pre.awk > ${outputdir}/merged30.txt
+	samtools view $sthreadstring -F 1024 -O sam ${outputdir}/merged_dedup.sam | awk -v mapq=1 -f ${juiceDir}/CPU/common/sam_to_pre.awk > ${outputdir}/merged1.txt
+	samtools view $sthreadstring -F 1024 -O sam ${outputdir}/merged_dedup.sam | awk -v mapq=30 -f ${juiceDir}/CPU/common/sam_to_pre.awk > ${outputdir}/merged30.txt
     else
 	if [ ! -s ${outputdir}/merged1.txt ] 
 	then
-	    samtools view $sthreadstring -F 1024 -O sam ${outputdir}/merged_dedup.bam | awk -v mapq=1 -f ${juiceDir}/scripts/common/sam_to_pre.awk > ${outputdir}/merged1.txt
+	    samtools view $sthreadstring -F 1024 -O sam ${outputdir}/merged_dedup.bam | awk -v mapq=1 -f ${juiceDir}/CPU/common/sam_to_pre.awk > ${outputdir}/merged1.txt
 	fi
 	if [ ! -s ${outputdir}/merged30.txt ]
 	then
-	    samtools view $sthreadstring -F 1024 -O sam ${outputdir}/merged_dedup.bam | awk -v mapq=30 -f ${juiceDir}/scripts/common/sam_to_pre.awk > ${outputdir}/merged30.txt
+	    samtools view $sthreadstring -F 1024 -O sam ${outputdir}/merged_dedup.bam | awk -v mapq=30 -f ${juiceDir}/CPU/common/sam_to_pre.awk > ${outputdir}/merged30.txt
 	fi
     fi
 
@@ -659,11 +659,11 @@ if [ -z $postproc ]
     then
 	if [ ! -s ${outputdir}/merged1_index.txt ]
 	then
-	    time ${juiceDir}/scripts/common/index_by_chr.awk ${outputdir}/merged1.txt 500000 > ${outputdir}/merged1_index.txt
+	    time ${juiceDir}/CPU/common/index_by_chr.awk ${outputdir}/merged1.txt 500000 > ${outputdir}/merged1_index.txt
 	fi
 	if [ ! -s ${outputdir}/merged30_index.txt ]
 	then
-	    time ${juiceDir}/scripts/common/index_by_chr.awk ${outputdir}/merged30.txt 500000 > ${outputdir}/merged30_index.txt
+	    time ${juiceDir}/CPU/common/index_by_chr.awk ${outputdir}/merged30.txt 500000 > ${outputdir}/merged30_index.txt
 	fi
     fi
 
@@ -682,7 +682,7 @@ if [ -z $postproc ]
 	samtools sort $sthreadstring ${outputdir}/merged_dedup.bam > ${outputdir}/merged_dedup_sort.bam
 	$call_methyl extract -F 1024 --keepSingleton --keepDiscordant $refSeq ${outputdir}/merged_dedup_sort.bam
 	$call_methyl extract -F 1024 --keepSingleton --keepDiscordant --cytosine_report  --CHH --CHG $refSeq ${outputdir}/merged_dedup_sort.bam
-	${juiceDir}/scripts/common/conversion.sh ${outputdir}/merged_dedup_sort.cytosine_report.txt > ${outputdir}/conversion_report.txt
+	${juiceDir}/CPU/common/conversion.sh ${outputdir}/merged_dedup_sort.cytosine_report.txt > ${outputdir}/conversion_report.txt
 	rm ${outputdir}/merged_dedup_sort.bam ${outputdir}/merged_dedup_sort.cytosine_report.txt*
     fi
 
@@ -695,21 +695,21 @@ if [ -z $postproc ]
 	ret=$(samtools view $sthreadstring -f 1024 -F 256 $outputdir/merged_dedup.bam | awk '{if ($0~/rt:A:7/){singdup++}else{dup++}}END{print dup,singdup}')
 	dups=$(echo $ret | awk '{print $1}')
 	singdups=$(echo $ret | awk '{print $2}')
-	cat $splitdir/*.res.txt | awk -v dups=$dups -v singdups=$singdups -v ligation=$ligation -v singleend=1 -f ${juiceDir}/scripts/common/stats_sub.awk >> $outputdir/inter.txt
+	cat $splitdir/*.res.txt | awk -v dups=$dups -v singdups=$singdups -v ligation=$ligation -v singleend=1 -f ${juiceDir}/CPU/common/stats_sub.awk >> $outputdir/inter.txt
     else
 	dups=$(samtools view -c -f 1089 -F 256 $sthreadstring $outputdir/merged_dedup.bam)
-	cat $splitdir/*.res.txt | awk -v dups=$dups -v ligation=$ligation -f ${juiceDir}/scripts/common/stats_sub.awk >> $outputdir/inter.txt
+	cat $splitdir/*.res.txt | awk -v dups=$dups -v ligation=$ligation -f ${juiceDir}/CPU/common/stats_sub.awk >> $outputdir/inter.txt
     fi
     
     cp $outputdir/inter.txt $outputdir/inter_30.txt
 
     if [ $assembly -eq 1 ] 
     then
-	${juiceDir}/scripts/common/juicer_tools statistics $site_file $outputdir/inter.txt $outputdir/merged1.txt none
-	${juiceDir}/scripts/common/juicer_tools statistics $site_file $outputdir/inter_30.txt $outputdir/merged30.txt none
+	${juiceDir}/CPU/common/juicer_tools statistics $site_file $outputdir/inter.txt $outputdir/merged1.txt none
+	${juiceDir}/CPU/common/juicer_tools statistics $site_file $outputdir/inter_30.txt $outputdir/merged30.txt none
     else
-	${juiceDir}/scripts/common/juicer_tools statistics $site_file $outputdir/inter.txt $outputdir/merged1.txt $genomePath
-	${juiceDir}/scripts/common/juicer_tools statistics $site_file $outputdir/inter_30.txt $outputdir/merged30.txt $genomePath
+	${juiceDir}/CPU/common/juicer_tools statistics $site_file $outputdir/inter.txt $outputdir/merged1.txt $genomePath
+	${juiceDir}/CPU/common/juicer_tools statistics $site_file $outputdir/inter_30.txt $outputdir/merged30.txt $genomePath
     fi
 
     # if early exit, we stop here, once the stats are calculated
@@ -717,12 +717,12 @@ if [ -z $postproc ]
     then
         if [ $assembly -eq 1 ]
         then
-            samtools view $sthreadstring -O SAM -F 1024 $outputdir/merged_dedup.*am | awk -v mnd=1 -f ${juiceDir}/scripts/common/sam_to_pre.awk > ${outputdir}/merged_nodups.txt
+            samtools view $sthreadstring -O SAM -F 1024 $outputdir/merged_dedup.*am | awk -v mnd=1 -f ${juiceDir}/CPU/common/sam_to_pre.awk > ${outputdir}/merged_nodups.txt
 	fi
 	export splitdir=${splitdir}; export outputdir=${outputdir}; export early=1; 
-	if ${juiceDir}/scripts/common/check.sh && [ "$cleanup" = 1 ]
+	if ${juiceDir}/CPU/common/check.sh && [ "$cleanup" = 1 ]
 	then
-	    ${juiceDir}/scripts/common/cleanup.sh
+	    ${juiceDir}/CPU/common/cleanup.sh
 	fi
 	exit
     fi
@@ -742,26 +742,26 @@ if [ -z $postproc ]
 	fragstr="-f $site_file"
     fi
 
-    time ${juiceDir}/scripts/common/juicer_tools pre -n -s $outputdir/inter.txt -g $outputdir/inter_hists.m $fragstr $resstr $threadHicString $outputdir/merged1.txt $outputdir/inter.hic $genomePath
-    time ${juiceDir}/scripts/common/juicer_tools addNorm $threadNormString ${outputdir}/inter.hic
+    time ${juiceDir}/CPU/common/juicer_tools pre -n -s $outputdir/inter.txt -g $outputdir/inter_hists.m $fragstr $resstr $threadHicString $outputdir/merged1.txt $outputdir/inter.hic $genomePath
+    time ${juiceDir}/CPU/common/juicer_tools addNorm $threadNormString ${outputdir}/inter.hic
     
     rm -R ${outputdir}"/HIC_tmp"
     date
     mkdir ${outputdir}"/HIC30_tmp"
-    time ${juiceDir}/scripts/common/juicer_tools pre -n -s $outputdir/inter_30.txt -g $outputdir/inter_30_hists.m $fragstr $resstr $threadHic30String $outputdir/merged30.txt $outputdir/inter_30.hic $genomePath
-    time ${juiceDir}/scripts/common/juicer_tools addNorm $threadNormString ${outputdir}/inter_30.hic
+    time ${juiceDir}/CPU/common/juicer_tools pre -n -s $outputdir/inter_30.txt -g $outputdir/inter_30_hists.m $fragstr $resstr $threadHic30String $outputdir/merged30.txt $outputdir/inter_30.hic $genomePath
+    time ${juiceDir}/CPU/common/juicer_tools addNorm $threadNormString ${outputdir}/inter_30.hic
    
     rm -R ${outputdir}"/HIC30_tmp"
     # POSTPROCESSING 
     if [ "$qc" != 1 ]
     then
-	${juiceDir}/scripts/common/juicer_postprocessing.sh -j ${juiceDir}/scripts/common/juicer_tools -i ${outputdir}/inter_30.hic -m ${juiceDir}/references/motif -g ${genomeID}  
+	${juiceDir}/CPU/common/juicer_postprocessing.sh -j ${juiceDir}/CPU/common/juicer_tools -i ${outputdir}/inter_30.hic -m ${juiceDir}/references/motif -g ${genomeID}  
     fi
 fi
 #CHECK THAT PIPELINE WAS SUCCESSFUL
 export early=$earlyexit
 export splitdir=$splitdir
-if ${juiceDir}/scripts/common/check.sh && [ "$cleanup" = 1 ]
+if ${juiceDir}/CPU/common/check.sh && [ "$cleanup" = 1 ]
 then
-    ${juiceDir}/scripts/common/cleanup.sh
+    ${juiceDir}/CPU/common/cleanup.sh
 fi	
